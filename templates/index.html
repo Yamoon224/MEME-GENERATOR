@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Générateur de mèmes</title>
+    <!-- On utilise Tailwind via CDN pour le prototypage rapide -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        // Config Tailwind personnalisée
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        // Palette de couleurs personnalisée
+                        'meme-primary': '#6366f1',
+                        'meme-secondary': '#8b5cf6',
+                        'meme-accent': '#ec4899',
+                        'meme-dark': '#1f2937',
+                        'meme-light': '#f9fafb',
+                        'meme-gray': '#6b7280',
+                    },
+                    fontFamily: {
+                        'impact': ['Impact', 'Arial Black', 'sans-serif'],
+                        'main': ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'custom': '0 4px 12px rgba(0, 0, 0, 0.08)',
+                        'hover': '0 8px 20px rgba(0, 0, 0, 0.12)',
+                    }
+                },
+            },
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Styles personnalisés -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎭</text></svg>">
+</head>
+<body class="font-main bg-gradient-to-b from-white to-gray-100 min-h-screen">
+    <!-- Conteneur principal -->
+    <div class="container mx-auto px-4 py-8 max-w-7xl">
+        <!-- En-tête -->
+        <header class="text-center mb-10 pt-8">
+            <h1 class="text-4xl md:text-5xl font-bold fancy-title mb-3">
+                Générateur de Mèmes
+            </h1>
+            <p class="text-meme-gray max-w-md mx-auto text-lg">
+                Créez, partagez et téléchargez vos mèmes personnalisés en quelques clics
+            </p>
+        </header>
+
+        <!-- Grille principale -->
+        <div class="grid gap-8 lg:grid-cols-5">
+            <!-- Panneau de gauche : Édition -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-xl shadow-custom border border-gray-200 overflow-hidden transition-all hover:shadow-hover">
+                    <!-- En-tête du panneau -->
+                    <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-gray-50 to-white">
+                        <h2 class="flex items-center gap-2 text-lg font-semibold text-meme-dark">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-meme-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                            </svg>
+                            Personnalisation
+                        </h2>
+                        <p class="text-sm text-meme-gray">Ajoutez votre image et personnalisez votre mème</p>
+                    </div>
+
+                    <!-- Corps du panneau -->
+                    <div class="p-6 space-y-6">
+                        <!-- Zone d'upload d'image -->
+                        <div class="bg-gray-50 rounded-lg p-4 border border-dashed border-gray-300 hover:bg-gray-100 transition-colors">
+                            <label for="image-upload" class="flex flex-col items-center gap-2 cursor-pointer">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-meme-primary opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                    <polyline points="21 15 16 10 5 21"></polyline>
+                                </svg>
+                                <span class="text-sm font-medium">Télécharger une image</span>
+                                <span class="text-xs text-meme-gray">PNG, JPG ou GIF (max 10MB)</span>
+                            </label>
+                            <input id="image-upload" type="file" accept="image/*" class="hidden">
+                        </div>
+
+                        <!-- Séparateur -->
+                        <div class="relative">
+                            <div class="absolute inset-0 flex items-center">
+                                <div class="w-full border-t border-gray-200"></div>
+                            </div>
+                            <div class="relative flex justify-center">
+                                <span class="bg-white px-2 text-xs text-meme-gray">TEXTE ET STYLE</span>
+                            </div>
+                        </div>
+
+                        <!-- Contrôles de texte -->
+                        <div class="space-y-6">
+                            <!-- Texte du haut -->
+                            <div class="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-meme-primary/30 transition-colors">
+                                <div class="space-y-2">
+                                    <label for="top-text" class="flex items-center gap-2 text-sm font-medium text-meme-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-meme-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                                            <line x1="9" y1="20" x2="15" y2="20"></line>
+                                            <line x1="12" y1="4" x2="12" y2="20"></line>
+                                        </svg>
+                                        Texte du haut
+                                    </label>
+                                    <input
+                                        id="top-text"
+                                        type="text"
+                                        placeholder="Texte du haut"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-meme-primary/50"
+                                    >
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!-- Taille de police du haut -->
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <label for="top-font-size" class="text-sm text-meme-gray">
+                                                Taille de police
+                                            </label>
+                                            <span id="top-font-size-value" class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-gray-100">40px</span>
+                                        </div>
+                                        <input
+                                            id="top-font-size"
+                                            type="range"
+                                            min="20"
+                                            max="80"
+                                            value="40"
+                                            class="slider-custom w-full"
+                                        >
+                                    </div>
+
+                                    <!-- Couleur du texte du haut -->
+                                    <div class="space-y-2">
+                                        <label for="top-text-color" class="text-sm text-meme-gray">
+                                            Couleur du texte
+                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <input
+                                                id="top-text-color"
+                                                type="color"
+                                                value="#ffffff"
+                                                class="w-10 h-10 p-1 cursor-pointer rounded color-picker"
+                                            >
+                                            <div id="top-color-preview" class="w-6 h-6 rounded-full border shadow-sm" style="background-color: #ffffff"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Texte du bas -->
+                            <div class="space-y-4 bg-gray-50 p-4 rounded-lg border border-gray-200 hover:border-meme-primary/30 transition-colors">
+                                <div class="space-y-2">
+                                    <label for="bottom-text" class="flex items-center gap-2 text-sm font-medium text-meme-dark">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-meme-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <polyline points="4 17 4 20 20 20 20 17"></polyline>
+                                            <line x1="9" y1="4" x2="15" y2="4"></line>
+                                            <line x1="12" y1="4" x2="12" y2="20"></line>
+                                        </svg>
+                                        Texte du bas
+                                    </label>
+                                    <input
+                                        id="bottom-text"
+                                        type="text"
+                                        placeholder="Texte du bas"
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-meme-primary/50"
+                                    >
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4">
+                                    <!-- Taille de police du bas -->
+                                    <div class="space-y-2">
+                                        <div class="flex items-center justify-between">
+                                            <label for="bottom-font-size" class="text-sm text-meme-gray">
+                                                Taille de police
+                                            </label>
+                                            <span id="bottom-font-size-value" class="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-gray-100">40px</span>
+                                        </div>
+                                        <input
+                                            id="bottom-font-size"
+                                            type="range"
+                                            min="20"
+                                            max="80"
+                                            value="40"
+                                            class="slider-custom w-full"
+                                        >
+                                    </div>
+
+                                    <!-- Couleur du texte du bas -->
+                                    <div class="space-y-2">
+                                        <label for="bottom-text-color" class="text-sm text-meme-gray">
+                                            Couleur du texte
+                                        </label>
+                                        <div class="flex items-center gap-2">
+                                            <input
+                                                id="bottom-text-color"
+                                                type="color"
+                                                value="#ffffff"
+                                                class="w-10 h-10 p-1 cursor-pointer rounded color-picker"
+                                            >
+                                            <div id="bottom-color-preview" class="w-6 h-6 rounded-full border shadow-sm" style="background-color: #ffffff"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Boutons d'action -->
+                        <div class="pt-4">
+                            <div class="flex flex-wrap gap-3">
+                                <button id="download-btn" disabled class="btn-primary flex-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                        <polyline points="7 10 12 15 17 10"></polyline>
+                                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                                    </svg>
+                                    Télécharger
+                                </button>
+                                <button id="share-btn" disabled class="btn-secondary flex-1">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="18" cy="5" r="3"></circle>
+                                        <circle cx="6" cy="12" r="3"></circle>
+                                        <circle cx="18" cy="19" r="3"></circle>
+                                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                                    </svg>
+                                    Partager
+                                </button>
+                            </div>
+                            <div class="flex flex-wrap gap-3 mt-3">
+                                <button id="save-btn" disabled class="btn-tertiary w-full">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                    </svg>
+                                    Sauvegarder dans la galerie
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panneau de droite : Prévisualisation/Galerie -->
+            <div class="lg:col-span-3">
+                <div class="h-full">
+                    <!-- Onglets -->
+                    <div class="tabs-container mb-6">
+                        <button id="editor-tab" class="tab-active">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                            </svg>
+                            Éditeur
+                        </button>
+                        <button id="gallery-tab">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            Galerie
+                        </button>
+                    </div>
+
+                    <!-- Contenu de l'onglet Éditeur -->
+                    <div id="editor-content" class="mt-0 h-full">
+                        <div class="border-2 border-gray-200 shadow-xl overflow-hidden h-full rounded-xl">
+                            <div class="p-0 h-full">
+                                <!-- Zone de prévisualisation -->
+                                <div id="preview-container" class="relative bg-[url('/static/grid-pattern.svg')] bg-gray-100 h-[500px] flex items-center justify-center p-6">
+                                    <!-- État vide -->
+                                    <div id="empty-state" class="flex flex-col items-center justify-center text-center">
+                                        <div class="bg-meme-primary/10 p-4 rounded-full inline-block mb-4">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-meme-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                                <polyline points="17 8 12 3 7 8"></polyline>
+                                                <line x1="12" y1="3" x2="12" y2="15"></line>
+                                            </svg>
+                                        </div>
+                                        <h3 class="text-xl font-semibold mb-2">Commencez votre création</h3>
+                                        <p class="text-meme-gray mb-6 max-w-md">
+                                            Téléchargez une image pour commencer à créer votre mème personnalisé
+                                        </p>
+                                        <button id="choose-image-btn" class="btn-primary inline-flex">
+                                            Choisir une image
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                                <polyline points="12 5 19 12 12 19"></polyline>
+                                            </svg>
+                                        </button>
+                                    </div>
+
+                                    <!-- Prévisualisation du mème -->
+                                    <div id="meme-preview" class="hidden relative max-w-full max-h-full overflow-auto shadow-2xl rounded-md">
+                                        <div id="loading-indicator" class="hidden absolute inset-0 bg-white/80 flex items-center justify-center z-10">
+                                            <div class="spinner"></div>
+                                        </div>
+                                        <img id="meme-image" class="max-w-full h-auto border border-gray-300 bg-white" src="/placeholder.svg" alt="Mème prévisualisé">
+                                    </div>
+                                </div>
+
+                                <!-- Bouton de réinitialisation -->
+                                <div class="flex justify-end p-4">
+                                    <button id="reset-btn" class="action-btn bg-red-500 hover:bg-red-600" title="Réinitialiser">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                            <path d="M3 3v5h5"></path>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenu de l'onglet Galerie -->
+                    <div id="gallery-content" class="hidden">
+                        <!-- État vide de la galerie -->
+                        <div id="empty-gallery" class="flex flex-col items-center justify-center h-[500px] bg-gray-50 border-2 border-dashed border-gray-200 rounded-lg">
+                            <div class="text-center p-8">
+                                <div class="bg-gray-100 p-4 rounded-full inline-block mb-4">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <line x1="2" y1="2" x2="22" y2="22"></line>
+                                        <path d="M10.41 10.41a2 2 0 1 1-2.83-2.83"></path>
+                                        <line x1="13.5" y1="13.5" x2="6" y2="21"></line>
+                                        <line x1="18" y1="12" x2="21" y2="15"></line>
+                                        <path d="M3.59 3.59a2 2 0 1 0 2.83 2.83"></path>
+                                        <line x1="10.5" y1="10.5" x2="18" y2="3"></line>
+                                        <line x1="6" y1="12" x2="3" y2="15"></line>
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-2">Galerie vide</h3>
+                                <p class="text-meme-gray max-w-md">
+                                    Aucun mème sauvegardé dans la galerie. Créez votre premier mème et sauvegardez-le pour le voir apparaître ici.
+                                </p>
+                            </div>
+                        </div>
+
+                        <!-- Grille de la galerie -->
+                        <div id="gallery-grid" class="grid gap-6 grid-cols-1 md:grid-cols-2 xl:grid-cols-3">
+                            <!-- Les mèmes sauvegardés seront ajoutés ici dynamiquement -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
+
